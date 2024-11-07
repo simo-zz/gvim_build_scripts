@@ -1,0 +1,78 @@
+#!/bin/sh
+reset
+gui=gtk-3
+config=0
+build=0
+install=0
+
+configok=.config.ok
+buildok=.build.ok
+
+while getopts ":g:cbi" o; do
+   case "${o}" in
+      g)
+         gui="${OPTARG}"
+         ;;
+      c)
+         config=1
+         ;;
+      b)
+         build=1
+         ;;
+      i)
+         install=1
+         ;;
+      *)
+         ;;
+    esac
+ done
+shift $((OPTIND-1))
+
+if [ ${config} -eq 1 ]; then
+   rm -fr ${configok} ${buildok}
+   make clean distclean
+   
+   ./configure \
+      --prefix=${HOME_NBCK}/usr/ \
+      --with-features=huge \
+      --enable-gui=${gui} \
+      --enable-multibyte \
+      --enable-terminal=no \
+      --enable-xim \
+      --with-tlib=ncurses \
+      --with-x \
+      --enable-fontset \
+      --enable-autoservername \
+      --disable-rightleft \
+      --disable-arabic \
+      --disable-farsi \
+      --enable-gpm=yes \
+      --enable-cscope \
+      --with-tclsh=/usr/bin/tclsh \
+      --with-gnome-includes=/usr/include/gtk-${gtkv}.0 \
+      --with-gnome-libs=/usr/lib/x86_64-redhat-linux6E/ \
+      --with-compiledby=simone.azzalin@kdpof.com 
+
+   if [ $? -eq 0 ]; then
+      touch ${configok}
+   fi
+fi
+
+if [ -e ${configok} ]; then
+   if [ ${build} -eq 1 ]; then
+      make -j 12
+
+      if [ $? -eq 0 ]; then
+         touch ${buildok}
+      fi
+   fi
+fi
+
+if [ -e ${configok} ]; then
+   if [ -e ${buildok} ]; then
+      if [ ${install} -eq 1 ]; then
+         make install
+      fi
+   fi
+fi
+
