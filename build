@@ -1,18 +1,27 @@
 #!/bin/sh
 reset
-make clean distclean
-./configure \
-   --prefix=/usr/local/ \
-   --with-features=huge --enable-gui=gtk3 \
-   --enable-multibyte --enable-terminal \
-   --with-tlib=ncurses \
-   --with-x  \
-   --with-gnome-includes=/usr/include/gtk-3.0 \
-   --with-gnome-libs=/usr/lib/x86_64-linux-gnu/ \
-   --enable-pythoninterp=dynamic \
-   --with-python-command=python \
-   --with-lua-prefix=/usr/ \
-   --with-compiledby=simone.azzalin@kdpof.com \
-   --enable-luainterp=dynamic
+gui=gtk-3
+while getopts ":s:" o; do
+   case "${o}" in
+      s)
+         src_dir="${OPTARG}"
+         ;;
+      *)
+         ;;
+    esac
+ done
+shift $((OPTIND-1))
+
+if [ -e ${src_dir} ]; then
+   make clean distclean
+   ./configure \
+      --prefix=/usr/local/ \
+      --with-features=huge --enable-gui=${gui} \
+      --enable-multibyte --enable-terminal \
+      --with-tlib=ncurses \
+      --with-x  \
+      --with-gnome-includes=/usr/include/gtk-3.0 \
+      --with-gnome-libs=/usr/lib/x86_64-linux-gnu 
+fi
 # make -j 12
 # make install
