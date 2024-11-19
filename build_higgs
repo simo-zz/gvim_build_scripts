@@ -27,6 +27,7 @@ while getopts ":g:cbi" o; do
          ;;
       s)
          src_dir="${OPTARG}"
+         ;;
       *)
          ;;
     esac
