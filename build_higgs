@@ -1,9 +1,12 @@
 #!/bin/sh
 reset
+
+cur_dir=${PWD}
 gui=gtk-3
 config=0
 build=0
 install=0
+src_dir=""
 
 configok=.config.ok
 buildok=.build.ok
@@ -22,11 +25,19 @@ while getopts ":g:cbi" o; do
       i)
          install=1
          ;;
+      s)
+         src_dir="${OPTARG}"
       *)
          ;;
     esac
  done
 shift $((OPTIND-1))
+
+if [ ! -z ${src_dir} ]; then
+   cd ${src_dir}
+else 
+   echo "src_dir empty (-s)"
+fi
 
 if [ ${config} -eq 1 ]; then
    rm -fr ${configok} ${buildok}
@@ -76,3 +87,4 @@ if [ -e ${configok} ]; then
    fi
 fi
 
+cd ${cur_dir}

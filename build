@@ -1,6 +1,7 @@
 #!/bin/sh
 reset
 gui=gtk-3
+src_dir=""
 while getopts ":s:" o; do
    case "${o}" in
       s)
@@ -12,16 +13,18 @@ while getopts ":s:" o; do
  done
 shift $((OPTIND-1))
 
-if [ -e ${src_dir} ]; then
-   make clean distclean
-   ./configure \
-      --prefix=/usr/local/ \
-      --with-features=huge --enable-gui=${gui} \
-      --enable-multibyte --enable-terminal \
-      --with-tlib=ncurses \
-      --with-x  \
-      --with-gnome-includes=/usr/include/gtk-3.0 \
-      --with-gnome-libs=/usr/lib/x86_64-linux-gnu 
+if [ ! -z ${src_dir} ]; then 
+   if [ -e ${src_dir} ]; then
+      make clean distclean
+      ./configure \
+         --prefix=/usr/local/ \
+         --with-features=huge --enable-gui=${gui} \
+         --enable-multibyte --enable-terminal \
+         --with-tlib=ncurses \
+         --with-x  \
+         --with-gnome-includes=/usr/include/gtk-3.0 \
+         --with-gnome-libs=/usr/lib/x86_64-linux-gnu 
+   fi
 fi
 # make -j 12
 # make install
