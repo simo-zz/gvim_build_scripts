@@ -1,9 +1,35 @@
 #!/bin/sh
 reset
-gui=gtk-3
+
+cur_dir=${PWD}
+guiv=3
+gui=gtk-${guiv}
+config=0
+build=0
+install=0
 src_dir=""
-while getopts ":s:" o; do
+gitupdt=0
+
+configok=.config.ok
+buildok=.build.ok
+
+while getopts ":g:ucbis:" o; do
    case "${o}" in
+      g)
+         gui="${OPTARG}"
+         ;;
+      c)
+         config=1
+         ;;
+      b)
+         build=1
+         ;;
+      i)
+         install=1
+         ;;
+      u)
+         gitupdt=1
+         ;;
       s)
          src_dir="${OPTARG}"
          ;;
@@ -13,18 +39,63 @@ while getopts ":s:" o; do
  done
 shift $((OPTIND-1))
 
-if [ ! -z ${src_dir} ]; then 
-   if [ -e ${src_dir} ]; then
-      make clean distclean
-      ./configure \
-         --prefix=/usr/local/ \
-         --with-features=huge --enable-gui=${gui} \
-         --enable-multibyte --enable-terminal \
-         --with-tlib=ncurses \
-         --with-x  \
-         --with-gnome-includes=/usr/include/gtk-3.0 \
-         --with-gnome-libs=/usr/lib/x86_64-linux-gnu 
+if [ ! -z ${src_dir} ]; then
+   cd ${src_dir}
+else 
+   echo "src_dir empty (-s)"
+fi
+
+if [ ${gitupdt} -eq 1 ]; then
+   git fetch --all --tags
+   git pull
+fi
+
+if [ ${config} -eq 1 ]; then
+   rm -fr ${configok} ${buildok}
+   sudo make uninstall
+   sudo make clean distclean
+      
+   ./configure \
+      --prefix=/usr/ \
+      --with-features=huge \
+      --enable-gui=${gui} \
+      --enable-multibyte \
+      --enable-terminal=no \
+      --enable-xim \
+      --with-tlib=ncurses \
+      --with-x \
+      --enable-fontset \
+      --enable-autoservername \
+      --disable-rightleft \
+      --disable-arabic \
+      --disable-farsi \
+      --enable-gpm=yes \
+      --enable-cscope \
+      --with-gnome-includes=/usr/include/gtk-${gtkv}.0 \
+      --with-compiledby=simone.azzalin@kdpof.com 
+
+   if [ $? -eq 0 ]; then
+      touch ${configok}
    fi
 fi
-# make -j 12
-# make install
+
+if [ -e ${configok} ]; then
+   if [ ${build} -eq 1 ]; then
+      make -j 12
+
+      if [ $? -eq 0 ]; then
+         touch ${buildok}
+      fi
+   fi
+fi
+
+if [ -e ${configok} ]; then
+   if [ -e ${buildok} ]; then
+      if [ ${install} -eq 1 ]; then
+         sudo make install
+      fi
+   fi
+fi
+
+cd ${cur_dir}
+

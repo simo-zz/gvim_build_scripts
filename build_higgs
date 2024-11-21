@@ -2,16 +2,18 @@
 reset
 
 cur_dir=${PWD}
-gui=gtk-3
+guiv=3
+gui=gtk-${guiv}
 config=0
 build=0
 install=0
 src_dir=""
+gitupdt=0
 
 configok=.config.ok
 buildok=.build.ok
 
-while getopts ":g:cbi" o; do
+while getopts ":g:ucbis:" o; do
    case "${o}" in
       g)
          gui="${OPTARG}"
@@ -24,6 +26,9 @@ while getopts ":g:cbi" o; do
          ;;
       i)
          install=1
+         ;;
+      u)
+         gitupdt=1
          ;;
       s)
          src_dir="${OPTARG}"
@@ -39,6 +44,12 @@ if [ ! -z ${src_dir} ]; then
 else 
    echo "src_dir empty (-s)"
 fi
+
+if [ ${gitupdt} -eq 1 ]; then
+   git fetch --all --tags
+   git pull
+fi
+
 
 if [ ${config} -eq 1 ]; then
    rm -fr ${configok} ${buildok}
