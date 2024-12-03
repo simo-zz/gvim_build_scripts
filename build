@@ -43,6 +43,7 @@ if [ ! -z ${src_dir} ]; then
    cd ${src_dir}
 else 
    echo "src_dir empty (-s)"
+   exit 1
 fi
 
 if [ ${gitupdt} -eq 1 ]; then
