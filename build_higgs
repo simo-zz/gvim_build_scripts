@@ -9,6 +9,7 @@ build=0
 install=0
 src_dir=""
 gitupdt=0
+n_cpus=$(cat /proc/cpuinfo  | grep processor | wc -l)
 
 configok=.config.ok
 buildok=.build.ok
@@ -56,7 +57,7 @@ fi
 if [ ${config} -eq 1 ]; then
    rm -fr ${configok} ${buildok}
    make clean distclean
-   
+   export CFLAGS="-Ofast -funroll-all-loops -fforward-propagate -foptimize-strlen -finline-functions-called-once -finline-small-functions -finline-functions"
    ./configure \
       --prefix=${HOME_NBCK}/usr/ \
       --with-features=huge \
@@ -85,7 +86,7 @@ fi
 
 if [ -e ${configok} ]; then
    if [ ${build} -eq 1 ]; then
-      make -j 12
+      make -j ${n_cpus}
 
       if [ $? -eq 0 ]; then
          touch ${buildok}
