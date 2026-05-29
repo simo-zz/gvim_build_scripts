@@ -1,6 +1,6 @@
 VIM_DIR = ./vim/
-GUIV = 3
-GUI = gtk-$(GUIV)
+v ?= 3
+GUI = gtk-$(v)
 
 NCPUS = $(shell cat /proc/cpuinfo  | grep processor | wc -l)
 
@@ -26,26 +26,28 @@ update:
 config:
 	cd $(VIM_DIR); \
 	export CFLAGS="-Ofast"; \
-    ./configure \
-      --prefix=/usr/local/ \
-      --with-features=huge \
-      --enable-gui=$(GUI) \
-      --enable-multibyte \
-      --enable-wayland \
-      --enable-fork \
-      --enable-terminal=no \
-      --enable-xim \
-      --with-tlib=ncurses \
-      --with-x \
-      --enable-fontset \
-      --enable-autoservername \
-      --disable-rightleft \
-      --disable-arabic \
-      --disable-farsi \
-      --enable-gpm=yes \
-      --enable-cscope \
-      --with-gnome-includes=/usr/include/gtk-${gtkv}.0 \
-      --with-compiledby=simo.zz.dev@gmail.com
+	./configure \
+	--prefix=/usr/local/ \
+	--with-features=huge \
+	--enable-$(GUI)-check \
+	--enable-gui=$(GUI) \
+	--enable-multibyte \
+	--enable-wayland \
+	--enable-fork \
+	--enable-terminal=no \
+	--enable-xim \
+	--with-tlib=ncurses \
+	--with-x \
+	--enable-fontset \
+	--enable-autoservername \
+	--disable-rightleft \
+	--disable-arabic \
+	--disable-farsi \
+	--enable-gpm=yes \
+	--enable-cscope \
+	--enable-year2038 \
+	--with-gnome-includes=/usr/include/gtk-${v}.0 \
+	--with-compiledby=simo.zz.dev@gmail.com
 
 compile:
 	$(MAKE) -C $(VIM_DIR) -j $(NCPUS)
